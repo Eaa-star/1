@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>侗歌XR·光影苗寨 | 非遗新消费沉浸式体验平台</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', 'PingFang SC', Roboto, sans-serif;
+            background: #FDF8F2;
+            color: #2A241E;
+            scroll-behavior: smooth;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        :root {
+            --pine: #1A4A3A;
+            --rust: #C2573A;
+            --ochre: #E6B13E;
+            --sand: #F4EDE4;
+            --shadow-md: 0 20px 35px -12px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.02);
+            --shadow-sm: 0 8px 20px -6px rgba(0, 0, 0, 0.05);
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 28px;
+            position: relative;
+            z-index: 2;
+        }
+
+        #particleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .navbar {
+            background: rgba(255, 248, 240, 0.96);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(194, 87, 58, 0.2);
+            padding: 14px 0;
+        }
+        .nav-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .logo h1 {
+            font-size: 1.7rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--pine), var(--rust));
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .logo p {
+            font-size: 0.7rem;
+            color: #8B7A67;
+            font-weight: 500;
+        }
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            font-weight: 500;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: #2A241E;
+            transition: 0.2s;
+            font-size: 0.95rem;
+        }
+        .nav-links a:hover {
+            color: var(--rust);
+            border-bottom: 2px solid var(--rust);
+            padding-bottom: 4px;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid var(--rust);
+            padding: 8px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            color: var(--rust);
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.9rem;
+        }
+        .btn-outline:hover {
+            background: var(--rust);
+            color: white;
+            transform: translateY(-2px);
+        }
+        .btn-primary {
+            background: var(--rust);
+            border: none;
+            padding: 12px 32px;
+            border-radius: 44px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 8px 16px rgba(194, 87, 58, 0.25);
+        }
+        .btn-primary:hover {
+            background: #9E4630;
+            transform: translateY(-3px);
+        }
+
+        .hero {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 48px;
+            padding: 56px 0 48px;
+        }
+        .hero-text {
+            flex: 1;
+        }
+        .hero-text h1 {
+            font-size: 3.4rem;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            color: #1E3A2F;
+        }
+        .hero-text p {
+            font-size: 1.1rem;
+            color: #4E4238;
+            margin-bottom: 28px;
+        }
+        .slogan-highlight {
+            background: linear-gradient(120deg, rgba(230,177,62,0.2), rgba(194,87,58,0.1));
+            padding: 0 8px;
+            border-radius: 20px;
+            font-weight: 600;
+            color: var(--rust);
+        }
+        .hero-stats {
+            display: flex;
+            gap: 36px;
+            margin: 28px 0 24px;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--rust);
+        }
+        
+        /* ========== 轮播图样式 - 固定高度 ========== */
+        .hero-image {
+            flex: 1;
+            border-radius: 36px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            /* 固定高度为420px，与所有图片等长，避免高度跳动 */
+            height: 420px;
+            background: #DCCFBF;
+        }
+        
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            border-radius: 36px;
+        }
+        
+        .carousel-slides {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+            height: 100%;
+        }
+        
+        .carousel-slide {
+            min-width: 100%;
+            height: 100%;
+        }
+        
+        .carousel-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        
+        .carousel-btn:hover {
+            background: rgba(194,87,58,0.8);
+            transform: translateY(-50%) scale(1.05);
+        }
+        
+        .carousel-btn-prev {
+            left: 15px;
+        }
+        
+        .carousel-btn-next {
+            right: 15px;
+        }
+        
+        .carousel-dots {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+        
+        .carousel-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .carousel-dot.active {
+            background: var(--ochre);
+            width: 24px;
+            border-radius: 10px;
+        }
+        
+        /* 响应式调整轮播图高度 */
+        @media (max-width: 1024px) {
+            .hero-image {
+                height: 380px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .hero-image {
+                height: 320px;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .hero-image {
+                height: 280px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .hero-image {
+                height: 240px;
+            }
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin: 56px 0 24px;
+            border-left: 6px solid var(--rust);
+            padding-left: 24px;
+            font-weight: 700;
+        }
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+            gap: 32px;
+            margin-bottom: 60px;
+        }
+        .product-card {
+            background: white;
+            border-radius: 32px;
+            padding: 28px 24px;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #F0E4D8;
+            cursor: pointer;
+        }
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-md);
+            border-color: rgba(194,87,58,0.3);
+        }
+        .card-icon {
+            font-size: 2.6rem;
+            margin-bottom: 20px;
+        }
+        .product-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+        .play-hint {
+            margin-top: 20px;
+            background: #F4EDE4;
+            border-radius: 60px;
+            padding: 8px 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.75rem;
+            color: var(--rust);
+            font-weight: 600;
+        }
+
+        /* AR模拟扫描区 */
+        .ar-simulator {
+            background: linear-gradient(145deg, #1E2F28, #15261F);
+            border-radius: 48px;
+            padding: 28px;
+            margin: 40px 0;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+        }
+        .scan-frame {
+            background: #0F1F19;
+            border-radius: 32px;
+            padding: 40px 24px;
+            margin-bottom: 20px;
+            border: 2px dashed var(--ochre);
+            position: relative;
+            transition: all 0.2s;
+        }
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 10%;
+            width: 80%;
+            height: 2px;
+            background: var(--ochre);
+            animation: scanMove 1.8s infinite ease-in-out;
+            box-shadow: 0 0 8px #E6B13E;
+        }
+        @keyframes scanMove {
+            0% { top: 10%; opacity: 0; }
+            50% { top: 85%; opacity: 1; }
+            100% { top: 10%; opacity: 0; }
+        }
+        .ar-result {
+            background: rgba(0,0,0,0.8);
+            border-radius: 28px;
+            padding: 24px;
+            color: white;
+            animation: fadeGlow 0.5s;
+        }
+        .ar-3d-preview {
+            font-size: 4rem;
+            margin: 20px 0;
+            background: rgba(255,215,150,0.2);
+            border-radius: 60px;
+            display: inline-block;
+            padding: 16px 32px;
+        }
+        @keyframes fadeGlow {
+            from { opacity: 0; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* B站视频模态框样式 */
+        .video-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.92);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(8px);
+        }
+        .video-modal.active {
+            display: flex;
+        }
+        .video-modal-content {
+            position: relative;
+            width: 90%;
+            max-width: 1000px;
+            background: #000;
+            border-radius: 20px;
+            overflow: hidden;
+            aspect-ratio: 16 / 9;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+        .video-modal-content iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .close-video-modal {
+            position: absolute;
+            top: -44px;
+            right: 0;
+            color: white;
+            font-size: 32px;
+            cursor: pointer;
+            background: rgba(0,0,0,0.6);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transition: all 0.2s;
+        }
+        .close-video-modal:hover {
+            background: var(--rust);
+            transform: scale(1.05);
+        }
+        .video-modal-title {
+            position: absolute;
+            bottom: -40px;
+            left: 0;
+            color: white;
+            font-size: 15px;
+            padding: 6px 14px;
+            background: rgba(0,0,0,0.6);
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+
+        .revenue-calc {
+            background: white;
+            border-radius: 40px;
+            padding: 28px;
+            margin: 32px 0;
+            box-shadow: var(--shadow-sm);
+        }
+        .slider-group {
+            margin: 18px 0;
+        }
+        .slider-group label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 8px;
+        }
+        input[type="range"] {
+            width: 100%;
+            margin: 10px 0;
+            -webkit-appearance: none;
+            background: #E0D6CC;
+            height: 6px;
+            border-radius: 10px;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--rust);
+            cursor: pointer;
+        }
+        .revenue-result {
+            background: var(--pine);
+            color: white;
+            padding: 16px;
+            border-radius: 32px;
+            text-align: center;
+            font-weight: 800;
+            font-size: 1.5rem;
+            margin-top: 16px;
+        }
+
+        .culture-map {
+            background: #FFFBF6;
+            border-radius: 32px;
+            padding: 28px;
+            margin: 40px 0;
+            border: 1px solid #F0E4D8;
+        }
+        .locations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin: 24px 0;
+        }
+        .location-card {
+            background: white;
+            border-radius: 24px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+        }
+        .location-card.visited {
+            border-color: var(--ochre);
+            background: linear-gradient(135deg, #FFF9E6, white);
+        }
+        .location-card .check-icon {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 22px;
+            height: 22px;
+            background: #4CAF50;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+        .location-card.visited .check-icon {
+            display: flex;
+        }
+        .location-icon {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+        }
+        .progress-bar-container {
+            background: rgba(26, 74, 58, 0.15);
+            border-radius: 20px;
+            height: 10px;
+            margin: 16px 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--pine), var(--ochre));
+            transition: width 0.4s;
+        }
+        .badge-area {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin: 16px 0;
+            flex-wrap: wrap;
+        }
+        .badge {
+            background: #EAE0D5;
+            border-radius: 40px;
+            padding: 6px 16px;
+            font-size: 13px;
+            opacity: 0.5;
+            transition: all 0.2s;
+        }
+        .badge.unlocked {
+            opacity: 1;
+            background: var(--ochre);
+            color: #1E3A2F;
+            font-weight: 600;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin: 32px 0;
+        }
+        .gallery-card {
+            background: white;
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+        .gallery-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+        .gallery-info {
+            padding: 14px;
+        }
+        .roadmap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            margin: 40px 0;
+        }
+        .milestone {
+            flex: 1;
+            background: white;
+            border-radius: 28px;
+            padding: 28px;
+            border-left: 5px solid var(--ochre);
+            box-shadow: var(--shadow-sm);
+        }
+        footer {
+            background: #1E2F28;
+            color: #EBDDCB;
+            padding: 48px 0 32px;
+            margin-top: 64px;
+            border-radius: 40px 40px 0 0;
+        }
+        .music-toggle {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #1A4A3A;
+            color: white;
+            border-radius: 60px;
+            padding: 10px 18px;
+            z-index: 99;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: none;
+            transition: all 0.2s;
+        }
+        .music-toggle:hover {
+            background: var(--rust);
+            transform: scale(1.02);
+        }
+        @media (max-width: 760px) {
+            .hero-text h1 { font-size: 2.2rem; }
+            .section-title { font-size: 1.6rem; }
+            .container { padding: 0 20px; }
+            .video-modal-title { font-size: 11px; bottom: -30px; white-space: normal; }
+            .close-video-modal { top: -35px; width: 32px; height: 32px; font-size: 24px; }
+            .carousel-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 16px;
+            }
+            .carousel-btn-prev { left: 8px; }
+            .carousel-btn-next { right: 8px; }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="particleCanvas"></canvas>
+
+<nav class="navbar">
+    <div class="container nav-flex">
+        <div class="logo">
+            <h1>侗歌XR·光影苗寨</h1>
+            <p>「扫一扫，非遗活了」</p>
+        </div>
+        <div class="nav-links">
+            <a href="#home">首页</a>
+            <a href="#products">XR体验坊</a>
+            <a href="#gallery">非遗源起</a>
+            <a href="#business">商业生态</a>
+        </div>
+        <button class="btn-outline" id="preRegisterBtn">📱 抢先预约内测</button>
+    </div>
+</nav>
+
+<main>
+    <div class="container" id="home">
+        <div class="hero">
+            <div class="hero-text">
+                <h1><span class="slogan-highlight">手机扫银饰，苗寨请进门</span><br>侗歌在耳边，文化在指尖</h1>
+                <p>轻量化XR+生成式AI —— 让千年非遗成为Z世代的潮流新日常。AR扫描、全景沉浸、数字孪生，三步开启沉浸式文化之旅。</p>
+                <div class="hero-stats">
+                    <div class="stat"><div class="stat-number">3</div>核心产品</div>
+                    <div class="stat"><div class="stat-number">5+</div>变现模式</div>
+                    <div class="stat"><div class="stat-number">20+</div>非遗工坊合作</div>
+                </div>
+                <button class="btn-primary" id="exploreBtn">✨ 探索非遗元宇宙</button>
+            </div>
+            
+            <!-- ========== 四张图片轮播图 - 固定高度等长 ========== -->
+            <div class="hero-image">
+                <div class="carousel-container">
+                    <div class="carousel-slides" id="carouselSlides">
+                        <div class="carousel-slide">
+                            <img src="https://n.sinaimg.cn/sinakd20117/715/w690h825/20210704/cf3f-f97ff35cf81fcfd9f134a26f4302c487.jpg" alt="肇兴侗寨鼓楼">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="https://p9.itc.cn/q_70/images03/20220901/209a908a3a89497e80e33eb03e2d3bcd.jpeg" alt="苗寨梯田晨雾">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="https://img.alicdn.com/imgextra/i3/2214959133621/O1CN01Fs6RUf1ccTAQd52NY_!!2214959133621.jpg" alt="非遗苗银">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="https://n.sinaimg.cn/sinacn11/266/w1600h1066/20181203/d754-hpinryc1380180.jpg" alt="侗族大歌表演">
+                        </div>
+                    </div>
+                    <button class="carousel-btn carousel-btn-prev" id="prevBtn">‹</button>
+                    <button class="carousel-btn carousel-btn-next" id="nextBtn">›</button>
+                    <div class="carousel-dots" id="carouselDots"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 三大核心模块 -->
+        <div id="products">
+            <div class="section-title">✨ 三大核心体验 · 非遗活态新玩法</div>
+            <div class="cards-grid">
+                <div class="product-card" id="arCardTrigger">
+                    <div class="card-icon">📱✨</div>
+                    <h3>XR非遗工坊 (AR)</h3>
+                    <p>手机扫描银饰/蜡染，激活3D工艺动画，听口述史，虚拟试戴国风滤镜。</p>
+                    <div class="play-hint"><span>🔍</span> 点击观看AR演示视频</div>
+                </div>
+                <div class="product-card" id="vrCardTrigger">
+                    <div class="card-icon">🎶🌀</div>
+                    <h3>侗歌幻境 (VR全景)</h3>
+                    <p>进入虚拟鼓楼，360°沉浸聆听侗族大歌，昼夜节庆模式，天籁环绕。</p>
+                    <div class="play-hint"><span>🎧</span> 点击观看VR全景演示</div>
+                </div>
+                <div class="product-card" id="twinCardTrigger">
+                    <div class="card-icon">🗺️🏞️</div>
+                    <h3>苗寨光影 (数字孪生)</h3>
+                    <p>高精地图导览，解锁打卡优惠，一键规划行程+非遗民宿推荐。</p>
+                    <div class="play-hint"><span>📍</span> 点击观看数字孪生演示</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- B站视频模态框 -->
+        <div id="videoModal" class="video-modal">
+            <div class="video-modal-content">
+                <span class="close-video-modal" id="closeVideoModal">&times;</span>
+                <iframe id="biliIframe" src="" frameborder="0" allowfullscreen></iframe>
+                <div class="video-modal-title" id="videoTitle">演示视频</div>
+            </div>
+        </div>
+
+        <!-- AR模拟交互展示区 -->
+        <div class="ar-simulator">
+            <h3 style="color:white; margin-bottom:16px;">🔍 轻量AR模拟体验区</h3>
+            <p style="color:#EBDDCB; margin-bottom:12px; font-size:14px;">点击下方按钮，体验「AR扫描唤醒非遗」的完整过程</p>
+            
+            <!-- 扫描前状态 -->
+            <div id="scanArea" class="scan-frame">
+                <div class="scan-line"></div>
+                <div style="color:#EBDDCB; text-align:center; padding:20px;">
+                    <div style="font-size:3rem; margin-bottom:12px;">📱🔍</div>
+                    <div>将手机摄像头对准下方纹样</div>
+                    <div style="font-size:12px; margin-top:8px;">苗绣 · 蝴蝶妈妈纹样 / 银饰太阳纹</div>
+                </div>
+                <div style="display:flex; justify-content:center; gap:12px; margin-top:16px;">
+                    <span style="background:#E6B13E20; padding:4px 12px; border-radius:20px;">🐟 鱼纹</span>
+                    <span style="background:#E6B13E20; padding:4px 12px; border-radius:20px;">🦋 蝴蝶妈妈</span>
+                    <span style="background:#E6B13E20; padding:4px 12px; border-radius:20px;">☀️ 太阳纹</span>
+                </div>
+            </div>
+            
+            <!-- 扫描按钮 -->
+            <button id="scanTriggerBtn" class="btn-primary" style="background:#E6B13E; color:#1E3A2F; margin-bottom:16px;">✨ 点击模拟AR扫描 · 唤醒非遗精灵</button>
+            
+            <!-- 扫描结果区域 -->
+            <div id="arResultDisplay" style="display:none;">
+                <div class="ar-result">
+                    <div class="ar-3d-preview">
+                        <span id="dynamicArtifact">🏺✨ 苗银护心镜</span>
+                    </div>
+                    <p id="dynamicDesc">🔊 錾刻声・传承人吴桂英：“每一锤都是祖辈的记忆”</p>
+                    <div style="background:#2A4538; border-radius:20px; padding:12px; margin:12px 0;">
+                        <p style="font-size:14px;">✨ 识别结果：苗族银饰 · 太阳纹护心镜</p>
+                        <p style="font-size:12px; opacity:0.8;">📖 寓意：太阳崇拜 · 驱邪纳福 · 护佑平安</p>
+                    </div>
+                    <video autoplay loop muted playsinline style="width:100%; border-radius:28px; margin-top:12px; max-height:200px; object-fit:cover;">
+                        <source src="https://assets.mixkit.co/videos/preview/mixkit-hands-of-a-artisan-working-on-silver-41426-large.mp4" type="video/mp4">
+                    </video>
+                    <div style="display:flex; gap:12px; justify-content:center; margin-top:16px;">
+                        <button class="btn-outline" style="background:white;" id="shareARBtn">✨ 生成非遗明信片</button>
+                        <button class="btn-outline" style="background:white;" id="resetScanBtn">🔄 重新扫描</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 打卡足迹地图 -->
+        <div class="culture-map">
+            <h3 style="font-size:1.8rem;">🗺️ 非遗守护者 · 文化足迹地图</h3>
+            <p>打卡黔东南地标，解锁限定徽章，成为非遗传承火种</p>
+            <div class="locations-grid" id="locationsGrid">
+                <div class="location-card" data-id="zhaoxing"><div class="check-icon">✓</div><div class="location-icon">🏯</div><div class="location-name">肇兴侗寨</div><div style="font-size:12px;">侗族大歌之乡</div></div>
+                <div class="location-card" data-id="xijiang"><div class="check-icon">✓</div><div class="location-icon">🏔️</div><div class="location-name">西江千户苗寨</div><div style="font-size:12px;">银饰·吊脚楼</div></div>
+                <div class="location-card" data-id="danzhai"><div class="check-icon">✓</div><div class="location-icon">🎨</div><div class="location-name">丹寨万达小镇</div><div style="font-size:12px;">蜡染·造纸</div></div>
+                <div class="location-card" data-id="kongbai"><div class="check-icon">✓</div><div class="location-icon">🔨</div><div class="location-name">控拜银匠村</div><div style="font-size:12px;">錾刻工艺</div></div>
+                <div class="location-card" data-id="langde"><div class="check-icon">✓</div><div class="location-icon">🎭</div><div class="location-name">朗德上寨</div><div style="font-size:12px;">苗族歌舞</div></div>
+            </div>
+            <div class="progress-bar-container"><div class="progress-fill" id="mapProgressFill"></div></div>
+            <div style="text-align:center;"><span id="visitedCount">0</span> / <span id="totalCount">5</span> 个地标已打卡</div>
+            <div class="badge-area" id="badgeArea">
+                <div class="badge" data-badge="silver">🥈 银饰鉴赏家</div>
+                <div class="badge" data-badge="song">🎵 侗歌知音</div>
+                <div class="badge" data-badge="master">🏆 非遗守护者</div>
+            </div>
+            <button id="resetMapBtn" class="btn-outline" style="margin-top:10px;">重置打卡</button>
+        </div>
+
+        <!-- 营收计算器 -->
+        <div class="revenue-calc" id="business">
+            <h3 style="font-size:1.8rem; margin-bottom:8px;">💰 新消费变现 · 轻付费模型推演</h3>
+            <p>滑动体验收入潜力 (基于肇兴侗寨客群假设)</p>
+            <div class="slider-group"><label>📊 年景区游客量 (万人次): <span id="touristVal">15</span>万</label><input type="range" id="touristSlider" min="5" max="50" step="1" value="15"></div>
+            <div class="slider-group"><label>🎯 XR体验转化率: <span id="convVal">6</span>%</label><input type="range" id="convSlider" min="1" max="20" step="0.5" value="6"></div>
+            <div class="slider-group"><label>💎 人均消费 (AR付费+联票): <span id="priceVal">12.5</span>元</label><input type="range" id="priceSlider" min="3" max="35" step="0.5" value="12.5"></div>
+            <div class="revenue-result">💰 预估年收入: <span id="revenueNum">0</span> 万元</div>
+        </div>
+
+        <!-- 非遗素材库 -->
+        <div id="gallery" style="background:#FFFBF6; border-radius:48px; padding:36px 28px; margin:20px 0;">
+            <h2 style="font-size:1.9rem;">📸 非遗数字素材库 · 实地采集影像</h2>
+            <div class="gallery-grid">
+                <div class="gallery-card"><img src="https://cbu01.alicdn.com/img/ibank/2012/489/248/684842984_264892887.jpg" alt="蜡染"><div class="gallery-info"><h4>丹寨蜡染·蝴蝶妈妈</h4><p>点蜡与靛蓝的对话</p></div></div>
+                <div class="gallery-card"><img src="https://n.sinaimg.cn/sinacn20117/298/w1618h1080/20190224/3fc3-htknpmi4887222.jpg" alt="银饰"><div class="gallery-info"><h4>控拜银饰·錾刻</h4><p>太阳纹与龙纹交叠</p></div></div>
+                <div class="gallery-card"><img src="https://pic.baike.soso.com/p/20140724/20140724160655-1950677332.jpg" alt="侗族大歌"><div class="gallery-info"><h4>肇兴侗寨·大歌传承</h4><p>天籁多声部</p></div></div>
+                <div class="gallery-card"><img src="https://pic.nximg.cn/file/20200717/28368347_220000428037_2.jpg" alt="苗绣"><div class="gallery-info"><h4>苗绣·龙鳞纹</h4><p>破线绣技艺</p></div></div>
+            </div>
+        </div>
+
+        <!-- 未来三年路线图 -->
+        <div><div class="section-title">📅 未来三年 · 非遗元宇宙路线图</div>
+        <div class="roadmap">
+            <div class="milestone"><h4>🌟 第一阶段 (0-6个月)</h4><p>AR Demo验证，小程序原型上线，2家工坊+1个景区试点</p></div>
+            <div class="milestone"><h4>🚀 第二阶段 (6-18个月)</h4><p>落地西江/肇兴，C端体验破5万人，营收突破90W+</p></div>
+            <div class="milestone"><h4>🌄 第三阶段 (18-36个月)</h4><p>覆盖贵州全域非遗文旅，开放AI纹样工具，年营收400W+</p></div>
+        </div></div>
+
+        <div style="background: #2B3B32; border-radius: 44px; padding: 32px; text-align: center; margin: 40px 0; color: #F0E7DC;">
+            <h3 style="font-size: 1.5rem;">🌾 让每一次点击，成为文化的重新呼吸</h3>
+            <p>带动手工艺人增收 · 促进青年返乡就业 · 永久保存非遗数字基因</p>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <div class="container" style="text-align:center">
+        <p>侗歌XR·光影苗寨 —— 「扫一扫，非遗活了」</p>
+    </div>
+</footer>
+
+<button id="musicPlayerBtn" class="music-toggle">🎵 侗歌天籁 · 播放背景音</button>
+<audio id="bgAudio" loop preload="auto">
+    <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808f0bf07.mp3?filename=meditation-ambient-14691.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+    (function(){
+        // ========== 1. 漂浮粒子系统 ==========
+        const canvas = document.getElementById('particleCanvas');
+        let ctx = canvas.getContext('2d');
+        let particles = [];
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        function initParticles() {
+            particles = [];
+            const count = 70;
+            for(let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 3 + 1,
+                    color: `rgba(230, 177, 62, ${Math.random() * 0.5 + 0.2})`,
+                    vx: (Math.random() - 0.5) * 0.3,
+                    vy: (Math.random() - 0.5) * 0.2 + 0.1
+                });
+            }
+        }
+        
+        function drawParticles() {
+            if(!ctx) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for(let p of particles) {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.fill();
+                p.x += p.vx;
+                p.y += p.vy;
+                if(p.x < 0) p.x = canvas.width;
+                if(p.x > canvas.width) p.x = 0;
+                if(p.y < 0) p.y = canvas.height;
+                if(p.y > canvas.height) p.y = 0;
+            }
+            requestAnimationFrame(drawParticles);
+        }
+        
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            initParticles();
+        });
+        resizeCanvas();
+        initParticles();
+        drawParticles();
+
+        // ========== 2. 轮播图功能 ==========
+        const slides = document.getElementById('carouselSlides');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const dotsContainer = document.getElementById('carouselDots');
+        const slideItems = document.querySelectorAll('.carousel-slide');
+        let currentIndex = 0;
+        const totalSlides = slideItems.length;
+        let autoPlayInterval;
+        
+        // 创建圆点指示器
+        function createDots() {
+            for(let i = 0; i < totalSlides; i++) {
+                const dot = document.createElement('div');
+                dot.classList.add('carousel-dot');
+                if(i === currentIndex) dot.classList.add('active');
+                dot.addEventListener('click', () => goToSlide(i));
+                dotsContainer.appendChild(dot);
+            }
+        }
+        
+        // 更新圆点状态
+        function updateDots() {
+            const dots = document.querySelectorAll('.carousel-dot');
+            dots.forEach((dot, index) => {
+                if(index === currentIndex) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        }
+        
+        // 切换到指定幻灯片
+        function goToSlide(index) {
+            if(index < 0) index = totalSlides - 1;
+            if(index >= totalSlides) index = 0;
+            currentIndex = index;
+            slides.style.transform = `translateX(-${currentIndex * 100}%)`;
+            updateDots();
+            resetAutoPlay();
+        }
+        
+        // 下一张
+        function nextSlide() {
+            goToSlide(currentIndex + 1);
+        }
+        
+        // 上一张
+        function prevSlide() {
+            goToSlide(currentIndex - 1);
+        }
+        
+        // 重置自动播放
+        function resetAutoPlay() {
+            if(autoPlayInterval) clearInterval(autoPlayInterval);
+            autoPlayInterval = setInterval(() => {
+                nextSlide();
+            }, 4000);
+        }
+        
+        // 绑定事件
+        if(prevBtn) prevBtn.addEventListener('click', prevSlide);
+        if(nextBtn) nextBtn.addEventListener('click', nextSlide);
+        
+        // 初始化圆点和自动播放
+        createDots();
+        resetAutoPlay();
+        
+        // 鼠标悬停时暂停自动播放
+        const carouselContainer = document.querySelector('.carousel-container');
+        if(carouselContainer) {
+            carouselContainer.addEventListener('mouseenter', () => {
+                if(autoPlayInterval) clearInterval(autoPlayInterval);
+            });
+            carouselContainer.addEventListener('mouseleave', () => {
+                resetAutoPlay();
+            });
+        }
+
+        // ========== 3. B站视频播放功能 ==========
+        const videoModal = document.getElementById('videoModal');
+        const biliIframe = document.getElementById('biliIframe');
+        const videoTitleSpan = document.getElementById('videoTitle');
+        const closeVideoModal = document.getElementById('closeVideoModal');
+        
+        const arVideoBVID = "BV1ti516jEXc";
+        const vrVideoBVID = "BV1gh516SEbz";
+        const twinVideoBVID = "BV1hh516SE4X";
+        
+        function getBilibiliIframeSrc(bvid) {
+            return `https://player.bilibili.com/player.html?bvid=${bvid}&page=1&as_wide=1&high_quality=1&danmaku=0`;
+        }
+        
+        function playBilibiliVideo(bvid, title) {
+            const src = getBilibiliIframeSrc(bvid);
+            biliIframe.src = src;
+            videoTitleSpan.innerText = title;
+            videoModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeVideo() {
+            videoModal.classList.remove('active');
+            biliIframe.src = '';
+            document.body.style.overflow = '';
+        }
+        
+        const arCard = document.getElementById('arCardTrigger');
+        const vrCard = document.getElementById('vrCardTrigger');
+        const twinCard = document.getElementById('twinCardTrigger');
+        
+        if(arCard) {
+            arCard.addEventListener('click', (e) => {
+                e.stopPropagation();
+                playBilibiliVideo(arVideoBVID, '🔨 非遗苗银3D模型 · AR工坊演示');
+            });
+        }
+        
+        if(vrCard) {
+            vrCard.addEventListener('click', (e) => {
+                e.stopPropagation();
+                playBilibiliVideo(vrVideoBVID, '🎶 侗族大歌 · 全景沉浸式天籁体验');
+            });
+        }
+        
+        if(twinCard) {
+            twinCard.addEventListener('click', (e) => {
+                e.stopPropagation();
+                playBilibiliVideo(twinVideoBVID, '🏞️ 西江千户苗寨 · 数字孪生智慧导览');
+            });
+        }
+        
+        if(closeVideoModal) {
+            closeVideoModal.addEventListener('click', closeVideo);
+        }
+        videoModal.addEventListener('click', (e) => {
+            if(e.target === videoModal) closeVideo();
+        });
+        
+        // ========== 4. AR扫描功能 ==========
+        const scanArea = document.getElementById('scanArea');
+        const arResultDisplay = document.getElementById('arResultDisplay');
+        const scanTriggerBtn = document.getElementById('scanTriggerBtn');
+        const resetScanBtn = document.getElementById('resetScanBtn');
+        const shareARBtn = document.getElementById('shareARBtn');
+        const dynamicArtifact = document.getElementById('dynamicArtifact');
+        const dynamicDesc = document.getElementById('dynamicDesc');
+        
+        const arContentMap = {
+            silver: { name: '🏺✨ 苗银护心镜', desc: '🔊 錾刻声・传承人吴桂英：“每一锤都是祖辈的记忆”', detail: '太阳纹 · 驱邪纳福' },
+            batik: { name: '🎨✨ 蜡染蝴蝶妈妈', desc: '🔊 点蜡声・传承人杨芳：“蝴蝶妈妈是苗族的始祖”', detail: '蜡染 · 万物起源' },
+            embroidery: { name: '🪡✨ 苗绣龙鳞纹', desc: '🔊 绣针穿梭・传承人李丽：“破线绣技艺需要极大耐心”', detail: '苗绣 · 龙纹祥瑞' }
+        };
+        
+        let currentARTarget = 'silver';
+        
+        function randomizeARContent() {
+            const keys = Object.keys(arContentMap);
+            const randomKey = keys[Math.floor(Math.random() * keys.length)];
+            currentARTarget = randomKey;
+            const content = arContentMap[currentARTarget];
+            if(dynamicArtifact) dynamicArtifact.innerHTML = content.name;
+            if(dynamicDesc) dynamicDesc.innerHTML = content.desc;
+            const detailDiv = document.querySelector('#arResultDisplay .ar-result > div');
+            if(detailDiv && detailDiv.querySelector('p:last-child')) {
+                const detailP = detailDiv.querySelector('p:last-child');
+                if(detailP) detailP.innerHTML = `📖 ${content.detail}`;
+            }
+        }
+        
+        function playScanBeep() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.frequency.value = 880;
+                gainNode.gain.value = 0.2;
+                oscillator.start();
+                gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.3);
+                oscillator.stop(audioCtx.currentTime + 0.3);
+            } catch(e) { console.log('音效需要用户交互'); }
+        }
+        
+        function performARScan() {
+            scanArea.style.opacity = '0.6';
+            scanArea.style.transform = 'scale(0.98)';
+            playScanBeep();
+            let scanProgress = 0;
+            const scanInterval = setInterval(() => {
+                scanProgress += 20;
+                if(scanProgress >= 100) {
+                    clearInterval(scanInterval);
+                    randomizeARContent();
+                    scanArea.style.display = 'none';
+                    arResultDisplay.style.display = 'block';
+                    if(navigator.vibrate) navigator.vibrate(100);
+                    scanArea.style.opacity = '1';
+                    scanArea.style.transform = 'scale(1)';
+                }
+            }, 200);
+        }
+        
+        function resetARScan() {
+            scanArea.style.display = 'block';
+            arResultDisplay.style.display = 'none';
+            scanArea.style.opacity = '1';
+            scanArea.style.transform = 'scale(1)';
+        }
+        
+        if(scanTriggerBtn) scanTriggerBtn.addEventListener('click', performARScan);
+        if(resetScanBtn) resetScanBtn.addEventListener('click', resetARScan);
+        
+        if(shareARBtn) {
+            shareARBtn.addEventListener('click', () => {
+                const content = arContentMap[currentARTarget];
+                alert(`🎉 非遗明信片已生成！\n\n「${content.name}」\n${content.desc}\n\n扫码分享给朋友，一起守护非遗文化！`);
+            });
+        }
+        
+        // ========== 5. 打卡地图功能 ==========
+        let visited = JSON.parse(localStorage.getItem('cultureVisited')) || [];
+        const locationCards = document.querySelectorAll('.location-card');
+        const visitedSpan = document.getElementById('visitedCount');
+        const totalSpan = document.getElementById('totalCount');
+        const progressFillMap = document.getElementById('mapProgressFill');
+        const badges = document.querySelectorAll('.badge');
+        const resetMapBtnElem = document.getElementById('resetMapBtn');
+        const totalLoc = locationCards.length;
+        if(totalSpan) totalSpan.innerText = totalLoc;
+        
+        function updateMapUI() {
+            locationCards.forEach(card => {
+                const id = card.getAttribute('data-id');
+                if(visited.includes(id)) card.classList.add('visited');
+                else card.classList.remove('visited');
+            });
+            const cnt = visited.length;
+            if(visitedSpan) visitedSpan.innerText = cnt;
+            const percent = (cnt / totalLoc) * 100;
+            if(progressFillMap) progressFillMap.style.width = `${percent}%`;
+            
+            const hasSilver = visited.includes('xijiang') && visited.includes('kongbai');
+            const hasSong = visited.includes('zhaoxing');
+            const hasMaster = cnt === totalLoc;
+            
+            if(badges[0]) hasSilver ? badges[0].classList.add('unlocked') : badges[0].classList.remove('unlocked');
+            if(badges[1]) hasSong ? badges[1].classList.add('unlocked') : badges[1].classList.remove('unlocked');
+            if(badges[2]) {
+                if(hasMaster) {
+                    badges[2].classList.add('unlocked');
+                    if(!localStorage.getItem('masterBadgeAwarded')) {
+                        setTimeout(() => alert('🏆 恭喜！你已成为「非遗守护者」！完整打卡黔东南文化地标！'), 500);
+                        localStorage.setItem('masterBadgeAwarded', 'true');
+                    }
+                } else {
+                    badges[2].classList.remove('unlocked');
+                }
+            }
+        }
+        
+        function toggleLocation(id) {
+            const idx = visited.indexOf(id);
+            if(idx === -1) visited.push(id);
+            else visited.splice(idx, 1);
+            localStorage.setItem('cultureVisited', JSON.stringify(visited));
+            updateMapUI();
+        }
+        
+        locationCards.forEach(card => {
+            card.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const id = card.getAttribute('data-id');
+                toggleLocation(id);
+            });
+        });
+        
+        if(resetMapBtnElem) {
+            resetMapBtnElem.addEventListener('click', () => {
+                if(confirm('重置所有打卡记录？')) {
+                    visited = [];
+                    localStorage.removeItem('cultureVisited');
+                    localStorage.removeItem('masterBadgeAwarded');
+                    updateMapUI();
+                    alert('✨ 打卡记录已重置，可以重新开始你的非遗守护之旅~');
+                }
+            });
+        }
+        updateMapUI();
+        
+        // ========== 6. 营收计算器 ==========
+        const touristSlider = document.getElementById('touristSlider');
+        const convSlider = document.getElementById('convSlider');
+        const priceSlider = document.getElementById('priceSlider');
+        const touristValSpan = document.getElementById('touristVal');
+        const convValSpan = document.getElementById('convVal');
+        const priceValSpan = document.getElementById('priceVal');
+        const revenueSpan = document.getElementById('revenueNum');
+        
+        function calcRevenue() {
+            let tourist = parseFloat(touristSlider?.value || 15);
+            let conv = parseFloat(convSlider?.value || 6);
+            let price = parseFloat(priceSlider?.value || 12.5);
+            if(touristValSpan) touristValSpan.innerText = tourist;
+            if(convValSpan) convValSpan.innerText = conv;
+            if(priceValSpan) priceValSpan.innerText = price.toFixed(1);
+            let revenueYuan = (tourist * 10000) * (conv / 100) * price;
+            let revenueWan = (revenueYuan / 10000).toFixed(1);
+            if(revenueSpan) revenueSpan.innerText = revenueWan;
+        }
+        
+        if(touristSlider) touristSlider.addEventListener('input', calcRevenue);
+        if(convSlider) convSlider.addEventListener('input', calcRevenue);
+        if(priceSlider) priceSlider.addEventListener('input', calcRevenue);
+        calcRevenue();
+        
+        // ========== 7. 背景音乐控制 ==========
+        const bgAudioElem = document.getElementById('bgAudio');
+        const musicBtnElem = document.getElementById('musicPlayerBtn');
+        let isMusicOn = false;
+        
+        if(musicBtnElem) {
+            musicBtnElem.addEventListener('click', () => {
+                if(isMusicOn) {
+                    bgAudioElem.pause();
+                    musicBtnElem.innerHTML = '🎵 侗歌天籁 · 播放背景音';
+                    isMusicOn = false;
+                } else {
+                    bgAudioElem.play().catch(e => console.log('需要用户交互'));
+                    bgAudioElem.volume = 0.2;
+                    musicBtnElem.innerHTML = '🔊 天籁萦绕 · 点击静音';
+                    isMusicOn = true;
+                }
+            });
+        }
+        
+        // ========== 8. 其他按钮 ==========
+        const preRegisterBtn = document.getElementById('preRegisterBtn');
+        const exploreBtn = document.getElementById('exploreBtn');
+        
+        if(preRegisterBtn) {
+            preRegisterBtn.addEventListener('click', () => alert('🎉 内测预约成功！我们将第一时间邀请您体验XR非遗小程序。'));
+        }
+        if(exploreBtn) {
+            exploreBtn.addEventListener('click', () => alert('🌟 沉浸式非遗元宇宙已开启！\n\n轻量XR技术 + 生成式AI，让千年文化触手可及。'));
+        }
+        
+        console.log('✅ 侗歌XR已就绪 - 轮播图固定高度，不再跳动！');
+    })();
+</script>
+</body>
+</html>
